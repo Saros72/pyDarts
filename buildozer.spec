@@ -19,9 +19,9 @@ orientation = portrait
 fullscreen = 0
 
 # --- ANDROID SDK ---
-android.api = 31
+android.api = 33
 android.minapi = 21
-android.target = 31
+android.target = 33
 
 # --- ANDROID PERMISSION ---
 android.permissions = INTERNET
@@ -32,6 +32,10 @@ android.archs = arm64-v8a
 
 android.add_resources = res
 android.extra_manifest_xml = manifest_fragment.xml
+
+android.enable_androidx = True
+android.gradle_dependencies = androidx.core:core:1.8.0
+
 
 # --- BOOTSTRAP ---
 p4a.bootstrap = sdl2
