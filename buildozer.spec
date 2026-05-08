@@ -31,7 +31,7 @@ android.archs = arm64-v8a
 
 # --- RESOURCES ---
 android.add_resources = res
-android.extra_manifest_xml = manifest_fragment.xml
+android.extra_manifest_application_arguments = manifest_fragment.xml
 
 # --- ANDROIDX ---
 android.enable_androidx = True
