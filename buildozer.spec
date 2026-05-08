@@ -29,9 +29,7 @@ android.permissions = INTERNET
 # --- ARCH ---
 android.archs = arm64-v8a
 
-# --- ANDROIDX ---
-#android.enable_androidx = True
-#android.gradle_dependencies = androidx.core:core:1.8.0
+android.add_resources = res
 
 # --- BOOTSTRAP ---
 p4a.bootstrap = sdl2
