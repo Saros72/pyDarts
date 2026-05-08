@@ -1,7 +1,7 @@
 from kivymd.uix.screen import MDScreen
 from kivy.lang import Builder
 from kivy.metrics import dp
-from cast_dialog import CastHandler
+#from cast_dialog import CastHandler
 
 # Barva pozadí (černo-modrá)
 DARK_BG = [0.08, 0.08, 0.1, 1]
@@ -124,12 +124,7 @@ KV_HOME = f'''
 class HomeScreen(MDScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.cast_handler = None
 
-    def open_cast_dialog(self):
-        if not self.cast_handler:
-            self.cast_handler = CastHandler()
-        self.cast_handler.show_device_dialog()
 
 # Načtení KV stringu
 Builder.load_string(KV_HOME)

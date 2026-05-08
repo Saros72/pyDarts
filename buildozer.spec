@@ -19,9 +19,9 @@ orientation = portrait
 fullscreen = 0
 
 # --- ANDROID SDK ---
-android.api = 33
-android.minapi = 21
-android.target = 33
+#android.api = 33
+#android.minapi = 21
+#android.target = 33
 
 # --- ANDROID PERMISSION ---
 android.permissions = INTERNET
