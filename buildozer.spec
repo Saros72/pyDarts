@@ -11,7 +11,9 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,json,txt,pdf
 
 # --- REQUIREMENTS ---
-requirements = python3,kivy,kivymd,pillow,pyjnius,fpdf2,fonttools,defusedxml
+#requirements = python3,kivy,kivymd,pillow,pyjnius,fpdf2,fonttools,defusedxml
+
+requirements = python3,kivy,kivymd,pillow,pyjnius,plyer
 
 # --- UI ---
 # portrait or landscape
@@ -19,9 +21,9 @@ orientation = portrait
 fullscreen = 0
 
 # --- ANDROID SDK ---
-#android.api = 33
-#android.minapi = 21
-#android.target = 33
+android.api = 31
+android.minapi = 21
+android.target = 31
 
 # --- ANDROID PERMISSION ---
 android.permissions = INTERNET
