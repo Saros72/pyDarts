@@ -2,17 +2,14 @@
 
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- interní storage aplikace -->
     <files-path
         name="files"
         path="." />
 
-    <!-- cache -->
     <cache-path
         name="cache"
         path="." />
 
-    <!-- Android/data/.../files -->
     <external-files-path
         name="external_files"
         path="." />
