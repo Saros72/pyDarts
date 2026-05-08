@@ -31,7 +31,7 @@ android.permissions = INTERNET
 android.archs = arm64-v8a
 
 android.add_resources = res
-android.extra_manifest_xml = manifest_fragment.xml
+android.manifest.application_dest = manifest_fragment.xml
 
 android.enable_androidx = True
 android.gradle_dependencies = androidx.core:core:1.8.0
