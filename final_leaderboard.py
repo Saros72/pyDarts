@@ -244,20 +244,18 @@ class FinalLeaderboardScreen(MDScreen):
         app = MDApp.get_running_app()
         log_file = getattr(app, 'log_filename', 'turnaj_log.txt')
         
-        # Cesta do interního úložiště aplikace
-        from android.storage import app_storage_path
-        base_path = app_storage_path()
+        # Jistější cesta pro Android (shodná s tvým logem)
+        from kivy.app import App
+        base_path = App.get_running_app().user_data_dir
         output_path = os.path.join(base_path, "Report_Darts.pdf")
         
-        # 1. Generování PDF (volá tvou funkci z pdf.py)
+        # 1. Generování PDF
         pdf_path = create_pdf(log_file, output_path)
         
-        # 2. Spuštění tvého profi sdílení
+        # 2. Sdílení
         if pdf_path and os.path.exists(pdf_path):
             from android_share import share_pdf
             share_pdf(pdf_path, "Otevřít výsledky turnaje")
-        else:
-            print("Chyba: PDF se nepodařilo vygenerovat.")
 
 
     def on_pre_enter(self):
