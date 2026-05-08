@@ -6,6 +6,10 @@ from kivy.metrics import dp
 from kivy.properties import StringProperty, BooleanProperty, ListProperty
 from kivy.factory import Factory
 from kivymd.app import MDApp
+from kivymd.uix.menu import MDDropdownMenu
+import os
+from kivy.utils import platform
+from pdf import create_pdf
 
 # --- KONFIGURACE BAREV (Sjednoceno) ---
 DARK_BG = [0.08, 0.08, 0.1, 1]
@@ -85,7 +89,7 @@ KV_FINAL = f'''
         orientation: 'vertical'
         md_bg_color: {DARK_BG}
 
-        # --- TOPBAR S DYNAMICKÝM TITULKEM ---
+        # --- TOPBAR S DYNAMICKÝM TITULKEM A MENU ---
         MDTopAppBar:
             id: toolbar
             title: "VÝSLEDKY - ZÁKLADNÍ ČÁST" if root.playoff_active else "VÝSLEDKY TURNAJE"
@@ -93,6 +97,7 @@ KV_FINAL = f'''
             elevation: 4
             md_bg_color: app.theme_cls.primary_color
             specific_text_color: 1, 1, 1, 1
+            right_action_items: [["dots-vertical", lambda x: root.open_menu(x)]]
 
         MDBoxLayout:
             orientation: 'vertical'
@@ -211,6 +216,49 @@ class FinalLeaderboardScreen(MDScreen):
     def __init__(self, **kwargs):
         Builder.load_string(KV_FINAL)
         super().__init__(**kwargs)
+        
+        # Inicializace Dropdown Menu
+        menu_items = [
+            {
+                "viewclass": "OneLineListItem",
+                "text": "Export do PDF",
+                "height": dp(56),
+                "on_release": lambda x="PDF": self.menu_callback(x),
+            }
+        ]
+        self.menu = MDDropdownMenu(
+            items=menu_items,
+            width=dp(160),
+        )
+
+    def open_menu(self, button):
+        self.menu.caller = button
+        self.menu.open()
+
+    def menu_callback(self, text_item):
+        self.menu.dismiss()
+        if text_item == "PDF":
+            self.generate_pdf_export()
+
+    def generate_pdf_export(self):
+        app = MDApp.get_running_app()
+        log_file = getattr(app, 'log_filename', 'turnaj_log.txt')
+        
+        # Cesta do interního úložiště aplikace
+        from android.storage import app_storage_path
+        base_path = app_storage_path()
+        output_path = os.path.join(base_path, "Report_Darts.pdf")
+        
+        # 1. Generování PDF (volá tvou funkci z pdf.py)
+        pdf_path = create_pdf(log_file, output_path)
+        
+        # 2. Spuštění tvého profi sdílení
+        if pdf_path and os.path.exists(pdf_path):
+            from android_share import share_pdf
+            share_pdf(pdf_path, "Otevřít výsledky turnaje")
+        else:
+            print("Chyba: PDF se nepodařilo vygenerovat.")
+
 
     def on_pre_enter(self):
         app = MDApp.get_running_app()

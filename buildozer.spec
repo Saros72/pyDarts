@@ -13,7 +13,7 @@ source.include_exts = py,png,jpg,kv,json,txt,pdf
 # --- REQUIREMENTS ---
 #requirements = python3,kivy,kivymd,pillow,pyjnius,fpdf2,fonttools,defusedxml
 
-requirements = python3,kivy,kivymd,pillow,pyjnius,plyer
+requirements = python3,kivy,kivymd,pillow,pyjnius,plyer,fpdf2,https://github.com/fonttools/fonttools/archive/refs/heads/main.zip
 
 # --- UI ---
 # portrait or landscape
@@ -21,9 +21,9 @@ orientation = portrait
 fullscreen = 0
 
 # --- ANDROID SDK ---
-android.api = 31
-android.minapi = 21
-android.target = 31
+#android.api = 31
+#android.minapi = 21
+#android.target = 31
 
 # --- ANDROID PERMISSION ---
 android.permissions = INTERNET
