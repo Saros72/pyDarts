@@ -1,3 +1,5 @@
+# buildozer.spec
+
 [app]
 
 title = pyDarts
@@ -14,25 +16,26 @@ source.include_exts = py,png,jpg,kv,json,txt,pdf,ini
 requirements = python3,kivy,kivymd,pillow,pyjnius,plyer,fpdf2,https://github.com/fonttools/fonttools/archive/refs/heads/main.zip
 
 # --- UI ---
-# portrait or landscape
 orientation = portrait
 fullscreen = 0
 
+# --- ANDROID ---
+android.api = 31
+android.minapi = 21
+android.target = 31
 
-# --- ANDROID PERMISSION ---
 android.permissions = INTERNET
 
 # --- ARCH ---
-#android.archs = arm64-v8a,armeabi-v7a
 android.archs = arm64-v8a
 
+# --- RESOURCES ---
 android.add_resources = res
-android.manifest.application_dest = manifest_fragment.xml
+android.extra_manifest_xml = manifest_fragment.xml
 
+# --- ANDROIDX ---
 android.enable_androidx = True
 android.gradle_dependencies = androidx.core:core:1.8.0
-
-
 
 # --- BOOTSTRAP ---
 p4a.bootstrap = sdl2

@@ -21,12 +21,11 @@ KV_HOME = f'''
             elevation: 4
             md_bg_color: app.theme_cls.primary_color
             specific_text_color: 1, 1, 1, 1
-            left_action_items: [["share-variant", lambda x: None]] 
+#            left_action_items: [["share-variant", lambda x: None]] 
             right_action_items: 
                 [
-                ["help-circle-outline", lambda x: None], 
                 ["account-multiple", lambda x: app.on_players_click()], 
-                ["cast", lambda x: None]
+                ["help-circle-outline", lambda x: None]
                 ]
 
         # --- STŘEDOVÁ ČÁST S LOGEM ---
