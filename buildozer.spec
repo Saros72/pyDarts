@@ -13,7 +13,7 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,json,txt,pdf,ini
 
 # --- REQUIREMENTS ---
-requirements = python3,kivy,kivymd,pillow,pyjnius,plyer,fpdf2,https://github.com/fonttools/fonttools/archive/refs/heads/main.zip
+requirements = python3,kivy,kivymd,pillow,pyjnius,fpdf2,https://github.com/fonttools/fonttools/archive/refs/heads/main.zip
 
 # --- UI ---
 orientation = portrait
@@ -29,13 +29,9 @@ android.permissions = INTERNET
 # --- ARCH ---
 android.archs = arm64-v8a
 
-# --- RESOURCES ---
-android.add_resources = res
-android.extra_manifest_application_arguments = manifest_fragment.xml
-
 # --- ANDROIDX ---
-android.enable_androidx = True
-android.gradle_dependencies = androidx.core:core:1.8.0
+#android.enable_androidx = True
+#android.gradle_dependencies = androidx.core:core:1.8.0
 
 # --- BOOTSTRAP ---
 p4a.bootstrap = sdl2
