@@ -29,7 +29,6 @@ android.permissions = INTERNET
 # --- ARCH ---
 android.archs = arm64-v8a
 
-android.add_resources = res
 
 # --- BOOTSTRAP ---
 p4a.bootstrap = sdl2
