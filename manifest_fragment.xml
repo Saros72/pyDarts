@@ -1,11 +1,15 @@
-<provider
-    android:name="androidx.core.content.FileProvider"
-    android:authorities="org.saros.pydarts.fileprovider"
-    android:grantUriPermissions="true"
-    android:exported="false">
+<application>
 
-    <meta-data
-        android:name="android.support.FILE_PROVIDER_PATHS"
-        android:resource="@xml/provider_paths"/>
+    <provider
+        android:name="androidx.core.content.FileProvider"
+        android:authorities="org.saros.pydarts.fileprovider"
+        android:grantUriPermissions="true"
+        android:exported="false">
 
-</provider>
+        <meta-data
+            android:name="android.support.FILE_PROVIDER_PATHS"
+            android:resource="@xml/provider_paths"/>
+
+    </provider>
+
+</application>
