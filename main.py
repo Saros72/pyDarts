@@ -23,6 +23,7 @@ from final_leaderboard import FinalLeaderboardScreen, FinalLeaderboardCard
 from swiss_manager import SwissManager
 from playoff import PlayoffScreen
 from after_playoff_results import AfterPlayoffScreen
+from about_tournament import AboutScreen
 
 # Definice tvé primární barvy
 HEX_PRIMARY = "#1D378A"
@@ -69,6 +70,7 @@ class TournamentApp(MDApp):
         # Registrace všech screenů
         self.sm.add_widget(HomeScreen(name='home_screen'))
         self.sm.add_widget(PlayerListScreen(name='list_screen'))
+        self.sm.add_widget(AboutScreen(name='about_screen'))
         self.sm.add_widget(SelectionScreen(name='selection_screen'))
         self.sm.add_widget(TournamentSetupScreen(name='setup_screen'))
         self.sm.add_widget(TournamentDashboardScreen(name='dashboard_screen'))
@@ -125,6 +127,11 @@ class TournamentApp(MDApp):
         self.sm.transition.direction = 'left'
         self.sm.transition.duration = 0.15
         self.sm.current = 'list_screen'
+
+    def go_to_about(self):
+        self.sm.transition.direction = 'left'
+        self.sm.transition.duration = 0.15
+        self.sm.current = 'about_screen'
 
     def go_back_to_home(self):
         self.sm.transition.direction = 'right'

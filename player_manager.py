@@ -24,6 +24,7 @@ KV_PLAYERS = f"""
     height: dp(55)
     padding: [dp(12), 0, 0, 0]
     spacing: dp(5)
+
     canvas.before:
         Color:
             rgba: {CARD_BG}
@@ -47,28 +48,33 @@ KV_PLAYERS = f"""
         size_hint_x: None
         width: dp(120)
         spacing: 0
+
         Button:
             size_hint: None, None
             size: dp(35), dp(55)
             background_normal: ''
             background_color: (0,0,0,0)
             on_release: root.screen.move_player(root, -1)
+
             canvas:
                 Color:
                     rgba: [0.6, 0.6, 0.6, 1]
                 Triangle:
                     points: [self.x + dp(10), self.y + dp(22), self.x + dp(25), self.y + dp(22), self.x + dp(17.5), self.y + dp(35)]
+
         Button:
             size_hint: None, None
             size: dp(35), dp(55)
             background_normal: ''
             background_color: (0,0,0,0)
             on_release: root.screen.move_player(root, 1)
+
             canvas:
                 Color:
                     rgba: [0.6, 0.6, 0.6, 1]
                 Triangle:
                     points: [self.x + dp(10), self.y + dp(33), self.x + dp(25), self.y + dp(33), self.x + dp(17.5), self.y + dp(20)]
+
         Button:
             text: "×"
             size_hint: None, None
@@ -85,12 +91,13 @@ KV_PLAYERS = f"""
         md_bg_color: {DARK_BG}
 
         MDTopAppBar:
-            title: "Seznam hráčů"
-            anchor_title: "left"
+            title: "SEZNAM HRÁČŮ"
+            anchor_title: "center"
             elevation: 4
             md_bg_color: app.theme_cls.primary_color
             specific_text_color: 1, 1, 1, 1
             left_action_items: [["arrow-left", lambda x: app.go_back_to_home()]]
+            right_action_items: [["", lambda x: None]]
 
         BoxLayout:
             orientation: 'vertical'
@@ -101,6 +108,7 @@ KV_PLAYERS = f"""
                 orientation: 'horizontal'
                 size_hint_y: None
                 height: dp(55)
+
                 canvas.before:
                     Color:
                         rgba: {CARD_BG}
@@ -108,6 +116,7 @@ KV_PLAYERS = f"""
                         pos: self.pos
                         size: self.size
                         radius: [dp(10),]
+
                 TextInput:
                     id: player_input
                     hint_text: "Jméno hráče..."
@@ -120,7 +129,7 @@ KV_PLAYERS = f"""
                     cursor_color: {INDIGO_PRIMARY}
                     hint_text_color: [0.5, 0.5, 0.5, 1]
                     on_text_validate: root.add_player()
-                
+
                 Widget:
                     size_hint_x: None
                     width: dp(70)
@@ -137,6 +146,7 @@ KV_PLAYERS = f"""
 
             ScrollView:
                 id: scroll_view
+
                 BoxLayout:
                     id: player_list
                     orientation: 'vertical'
@@ -147,9 +157,11 @@ KV_PLAYERS = f"""
 
 class PlayerEntryCard(BoxLayout):
     player_name = StringProperty("")
+
     def __init__(self, screen, **kwargs):
         super().__init__(**kwargs)
         self.screen = screen
+
 
 class PlayerListScreen(MDScreen):
     filename = "players.ini"
@@ -160,19 +172,29 @@ class PlayerListScreen(MDScreen):
         self.load_players_to_ui()
 
     def scroll_to_bottom(self, dt):
-        self.ids.scroll_view.scroll_y = 0
+        scroll = self.ids.scroll_view
+        container = self.ids.player_list
+
+        # Scrolluj jen pokud je obsah vyšší než ScrollView
+        if container.height > scroll.height:
+            scroll.scroll_y = 0
+        else:
+            scroll.scroll_y = 1
 
     def add_player(self, name_text=None):
         ti = self.ids.player_input
         name = name_text if name_text else ti.text.strip().title()
+
         if name:
             new_card = PlayerEntryCard(player_name=name, screen=self)
             self.ids.player_list.add_widget(new_card)
-            if not name_text: 
+
+            if not name_text:
                 ti.text = ""
-                # Odrolování dolů po přidání nového hráče
+
+                # Automatický scroll na posledního hráče
                 Clock.schedule_once(self.scroll_to_bottom, 0.1)
-            
+
             self.save_players()
 
     def remove_player(self, card_instance):
@@ -182,37 +204,54 @@ class PlayerListScreen(MDScreen):
 
     def move_player(self, card, direction):
         container = self.ids.player_list
+
         if card in container.children:
             idx = container.children.index(card)
-            new_idx = idx - direction 
+            new_idx = idx - direction
+
             if 0 <= new_idx < len(container.children):
                 container.remove_widget(card)
                 container.add_widget(card, index=new_idx)
                 self.save_players()
 
     def save_players(self):
-        players = [child.player_name for child in reversed(self.ids.player_list.children) if hasattr(child, 'player_name')]
+        players = [
+            child.player_name
+            for child in reversed(self.ids.player_list.children)
+            if hasattr(child, 'player_name')
+        ]
+
         config = configparser.ConfigParser()
         config['players'] = {'list': ','.join(players)}
+
         try:
             with open(self.filename, 'w', encoding='utf-8') as configfile:
                 config.write(configfile)
+
         except Exception as e:
             print(f"Chyba při ukládání: {e}")
 
     def load_players_to_ui(self):
         if os.path.exists(self.filename):
             config = configparser.ConfigParser()
+
             try:
                 config.read(self.filename, encoding='utf-8')
+
                 if 'players' in config and 'list' in config['players']:
                     names_str = config['players']['list']
+
                     if names_str:
                         names = names_str.split(',')
+
                         for name in names:
                             if name.strip():
-                                # Načtení bez automatického scrollu a zbytečného ukládání
-                                new_card = PlayerEntryCard(player_name=name.strip(), screen=self)
+                                new_card = PlayerEntryCard(
+                                    player_name=name.strip(),
+                                    screen=self
+                                )
+
                                 self.ids.player_list.add_widget(new_card)
+
             except Exception as e:
                 print(f"Chyba při načítání: {e}")

@@ -1,14 +1,20 @@
 # final_leaderboard.py
-from kivymd.uix.screen import MDScreen
+import os
+from datetime import datetime
 from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
 from kivy.metrics import dp
 from kivy.properties import StringProperty, BooleanProperty, ListProperty
 from kivy.factory import Factory
-from kivymd.app import MDApp
-from kivymd.uix.menu import MDDropdownMenu
-import os
 from kivy.utils import platform
+
+from kivymd.app import MDApp
+from kivymd.uix.screen import MDScreen
+from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.dialog import MDDialog
+from kivymd.uix.button import MDFlatButton
+from kivymd.toast import toast
+
 from pdf import create_pdf
 
 # --- KONFIGURACE BAREV (Sjednoceno) ---
@@ -97,7 +103,8 @@ KV_FINAL = f'''
             elevation: 4
             md_bg_color: app.theme_cls.primary_color
             specific_text_color: 1, 1, 1, 1
-            right_action_items: [["dots-vertical", lambda x: root.open_menu(x)]]
+            left_action_items: [["", lambda x: None]] if not root.playoff_active else []
+            right_action_items: [["dots-vertical", lambda x: root.open_menu(x)]] if not root.playoff_active else []
 
         MDBoxLayout:
             orientation: 'vertical'
@@ -142,7 +149,7 @@ KV_FINAL = f'''
                     height: self.minimum_height
                     spacing: dp(6)
 
-            # --- SPODNÍ TLAČÍTKO (Sjednocené rozměry dp(55)) ---
+            # --- SPODNÍ TLAČÍTKO ---
             AnchorLayout:
                 anchor_x: 'center'
                 size_hint_y: None
@@ -174,7 +181,7 @@ class FinalLeaderboardCard(BoxLayout):
     points = StringProperty("0")
     bh = StringProperty("0")
     playoff_active = BooleanProperty(False)
-    circle_color = ListProperty([0.247, 0.318, 0.710, 1]) # Default Indigo
+    circle_color = ListProperty([0.247, 0.318, 0.710, 1])
     text_color = ListProperty(WHITE)
 
     def on_rank(self, *args):
@@ -212,12 +219,12 @@ class FinalLeaderboardCard(BoxLayout):
 
 class FinalLeaderboardScreen(MDScreen):
     playoff_active = BooleanProperty(False)
+    dialog = None
 
     def __init__(self, **kwargs):
         Builder.load_string(KV_FINAL)
         super().__init__(**kwargs)
         
-        # Inicializace Dropdown Menu
         menu_items = [
             {
                 "viewclass": "OneLineListItem",
@@ -243,11 +250,53 @@ class FinalLeaderboardScreen(MDScreen):
     def generate_pdf_export(self):
         app = MDApp.get_running_app()
         log_file = getattr(app, 'log_filename', 'turnaj_log.txt')
-        base_path = "/sdcard/Documents"
-
-        output_path = os.path.join(base_path, "Report_Darts.pdf")
         
-        pdf_path = create_pdf(log_file, output_path)
+        # Časová značka pro unikátní název
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        filename = f"pyDarts_{timestamp}.pdf"
+        
+        base_path = "/sdcard/Documents"
+        output_path = os.path.join(base_path, filename)
+        
+        try:
+            pdf_path = create_pdf(log_file, output_path)
+            
+            if pdf_path and os.path.exists(pdf_path):
+                self.show_alert(
+                    "pyDarts", 
+                    "PDF uloženo do složky Dokumenty."
+                )
+            else:
+                toast("Chyba: PDF nebylo uloženo")
+        except Exception as e:
+            toast(f"Chyba při exportu: {str(e)}")
+
+    def show_alert(self, title, text):
+        app = MDApp.get_running_app()  # Přidán chybějící odkaz na aplikaci
+        
+        if not self.dialog:
+            self.dialog = MDDialog(
+                title=title,
+                text=text,
+                md_bg_color=CARD_BG,
+                buttons=[
+                    MDFlatButton(
+                        text="OK",
+                        theme_text_color="Custom",
+                        text_color=app.theme_cls.primary_color,
+                        on_release=lambda x: self.dialog.dismiss()
+                    ),
+                ],
+            )
+        else:
+            self.dialog.title = title
+            self.dialog.text = text
+
+        # Přímé obarvení prvků uvnitř dialogu
+        self.dialog.ids.title.color = WIN_GREEN
+        self.dialog.ids.text.color = WHITE
+        
+        self.dialog.open()
 
 
     def on_pre_enter(self):

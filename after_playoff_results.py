@@ -1,4 +1,6 @@
 # after_playoff_results.py
+import os
+from datetime import datetime
 from kivymd.uix.screen import MDScreen
 from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
@@ -8,6 +10,12 @@ from kivy.factory import Factory
 from kivymd.app import MDApp
 from kivymd.uix.tab import MDTabsBase
 from kivy.clock import Clock
+from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.dialog import MDDialog
+from kivymd.uix.button import MDFlatButton
+from kivymd.toast import toast
+
+from pdf import create_pdf
 
 # --- KONFIGURACE BAREV ---
 DARK_BG = [0.08, 0.08, 0.1, 1]
@@ -68,11 +76,14 @@ KV_CONTENT = f'''
         md_bg_color: {DARK_BG}
 
         MDTopAppBar:
+            id: toolbar
             title: "VÝSLEDKY TURNAJE"
             anchor_title: "center"
             elevation: 4
             md_bg_color: app.theme_cls.primary_color
             specific_text_color: 1, 1, 1, 1
+            left_action_items: [["", lambda x: None]]
+            right_action_items: [["dots-vertical", lambda x: root.open_menu(x)]]
 
         MDTabs:
             id: result_tabs
@@ -180,6 +191,72 @@ class AfterPlayoffCard(BoxLayout):
 
 class AfterPlayoffScreen(MDScreen):
     playoff_results = ListProperty([]) 
+    dialog = None
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        menu_items = [
+            {
+                "viewclass": "OneLineListItem",
+                "text": "Export do PDF",
+                "height": dp(56),
+                "on_release": lambda x="PDF": self.menu_callback(x),
+            }
+        ]
+        self.menu = MDDropdownMenu(
+            items=menu_items,
+            width=dp(160),
+        )
+
+    def open_menu(self, button):
+        self.menu.caller = button
+        self.menu.open()
+
+    def menu_callback(self, text_item):
+        self.menu.dismiss()
+        if text_item == "PDF":
+            self.generate_pdf_export()
+
+    def generate_pdf_export(self):
+        app = MDApp.get_running_app()
+        log_file = getattr(app, 'log_filename', 'turnaj_log.txt')
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        filename = f"pyDarts_{timestamp}.pdf"
+        base_path = "/sdcard/Documents"
+        output_path = os.path.join(base_path, filename)
+        
+        try:
+            pdf_path = create_pdf(log_file, output_path)
+            if pdf_path and os.path.exists(pdf_path):
+                self.show_alert("pyDarts", "PDF uloženo do složky Dokumenty.")
+            else:
+                toast("Chyba: PDF nebylo uloženo")
+        except Exception as e:
+            toast(f"Chyba při exportu: {str(e)}")
+
+    def show_alert(self, title, text):
+        app = MDApp.get_running_app()
+        if not self.dialog:
+            self.dialog = MDDialog(
+                title=title,
+                text=text,
+                md_bg_color=CARD_BG,
+                buttons=[
+                    MDFlatButton(
+                        text="OK",
+                        theme_text_color="Custom",
+                        text_color=app.theme_cls.primary_color,
+                        on_release=lambda x: self.dialog.dismiss()
+                    ),
+                ],
+            )
+        else:
+            self.dialog.title = title
+            self.dialog.text = text
+
+        self.dialog.ids.title.color = WIN_GREEN
+        self.dialog.ids.text.color = WHITE
+        self.dialog.open()
 
     def on_enter(self):
         Clock.schedule_once(self.fill_data, 0.2)

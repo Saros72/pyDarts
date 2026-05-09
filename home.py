@@ -25,7 +25,7 @@ KV_HOME = f'''
             right_action_items: 
                 [
                 ["account-multiple", lambda x: app.on_players_click()], 
-                ["help-circle-outline", lambda x: None]
+                ["help-circle-outline", lambda x: app.go_to_about()]
                 ]
 
         # --- STŘEDOVÁ ČÁST S LOGEM ---
