@@ -11,6 +11,7 @@ from kivymd.toast import toast
 # --- KONFIGURACE BAREV ---
 DARK_BG = [0.08, 0.08, 0.1, 1]
 CARD_BG = [0.15, 0.17, 0.25, 1]
+#CARD_BG = [0.12, 0.15, 0.20, 1]
 HEADER_BG = [0.12, 0.14, 0.2, 1]
 WIN_GREEN = [0.0, 0.9, 0.4, 1]
 WHITE = [1, 1, 1, 1]
@@ -58,7 +59,7 @@ Builder.load_string(f"""
         Label:
             text: "BYE" if root.is_bye else root.match_label
             font_size: '14sp'
-            color: app.theme_cls.primary_color
+            color: "#157DDC"
             bold: True
             halign: 'center'
             letter_spacing: 1.2
@@ -86,7 +87,7 @@ Builder.load_string(f"""
                     valign: 'middle'
                     text_size: self.size
                     shorten: True
-                    shorten_from: 'right'  # Zkracování na konci
+                    shorten_from: 'right'
                     max_lines: 1
                 TournamentCheckbox:
                     active: root.winner == 1
@@ -113,7 +114,7 @@ Builder.load_string(f"""
                     valign: 'middle'
                     text_size: self.size
                     shorten: True
-                    shorten_from: 'right'  # Zkracování na konci
+                    shorten_from: 'right'
                     max_lines: 1
                 TournamentCheckbox:
                     active: root.winner == 2
@@ -135,7 +136,7 @@ Builder.load_string(f"""
                 valign: 'middle'
                 text_size: self.size
                 shorten: True
-                shorten_from: 'right' # Zkracování na konci i u BYE
+                shorten_from: 'right'
 
 <TournamentDashboardScreen>:
     MDBoxLayout:
@@ -193,10 +194,42 @@ class PairCard(BoxLayout):
         if self.is_bye:
             return
         self.winner = num
+        
+        # Okamžitá aktualizace webu bez hledání jména obrazovky
+        app = MDApp.get_running_app()
+        current_screen = app.sm.current_screen
+        if hasattr(current_screen, 'update_web_live'):
+            current_screen.update_web_live()
 
 class TournamentDashboardScreen(MDScreen):
     current_round = NumericProperty(1)
     total_rounds = NumericProperty(5)
+
+    def update_web_live(self):
+        """Metoda pro hromadné odeslání stavu všech karet na web."""
+        app = MDApp.get_running_app()
+        if hasattr(app, 'web_server') and app.web_server:
+            matches_to_web = []
+            if 'pairs_container' in self.ids:
+                for card in reversed(self.ids.pairs_container.children):
+                    if isinstance(card, PairCard):
+                        matches_to_web.append({
+                            "label": card.match_label,
+                            "p1": card.player1,
+                            "p2": card.player2,
+                            "winner": card.winner,
+                            "is_bye": card.is_bye
+                        })
+                
+                app.web_server.update_data({
+                    "phase": "dashboard",
+                    "round": self.current_round,
+                    "total_rounds": self.total_rounds,
+                    "matches": matches_to_web
+                })
+
+    def on_enter(self):
+        self.update_web_live()
 
     def confirm_results(self):
         app = MDApp.get_running_app()
@@ -218,10 +251,8 @@ class TournamentDashboardScreen(MDScreen):
                 )
 
         app.app_manager.record_round_state(self.current_round)
-        leaderboard = app.sm.get_screen('leaderboard_screen')
-        if hasattr(leaderboard.ids, 'leaderboard_scroll'):
-            leaderboard.ids.leaderboard_scroll.scroll_y = 1.0
-            
+        
+        # Přechod na žebříček
         self.manager.transition.direction = 'left'
         self.manager.current = 'leaderboard_screen'
 

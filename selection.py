@@ -10,6 +10,7 @@ import os
 # --- KONFIGURACE BAREV (Sjednoceno s Indigo tématem) ---
 DARK_BG = [0.08, 0.08, 0.1, 1]
 CARD_BG = [0.15, 0.17, 0.25, 1]
+#CARD_BG = [0.12, 0.15, 0.20, 1]
 WIN_GREEN = [0.0, 0.9, 0.4, 1]
 WHITE = [1, 1, 1, 1]
 

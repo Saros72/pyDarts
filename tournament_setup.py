@@ -3,11 +3,18 @@ from kivymd.uix.screen import MDScreen
 from kivy.lang import Builder
 from kivy.properties import StringProperty, NumericProperty, BooleanProperty
 from kivy.metrics import dp
-import math
+from kivymd.toast import toast
+from kivy.core.clipboard import Clipboard
+from kivy.app import App  # Přidáno pro přístup k web_server
 
-# --- KONFIGURACE BAREV (Sjednoceno) ---
+import math
+import socket
+import datetime  # Přidáno pro formátování data na webu
+
+# --- KONFIGURACE BAREV ---
 DARK_BG = [0.08, 0.08, 0.1, 1]
 CARD_BG = [0.15, 0.17, 0.25, 1]
+#CARD_BG = [0.12, 0.15, 0.20, 1]
 WIN_GREEN = [0.0, 0.9, 0.4, 1]
 WHITE = [1, 1, 1, 1]
 
@@ -49,7 +56,6 @@ KV_SETUP = f"""
         orientation: 'vertical'
         md_bg_color: {DARK_BG}
 
-        # --- TOPBAR S CENTROVANÝM TITULKEM ---
         MDTopAppBar:
             title: "PŘEDVOLBY TURNAJE"
             anchor_title: "center"
@@ -207,6 +213,44 @@ KV_SETUP = f"""
                         size_hint_x: None
                         width: dp(60)
 
+
+            # 4. SEKCE: TURNAJ ONLINE
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: dp(8)
+
+                Label:
+                    text: "TURNAJ ONLINE"
+                    font_size: '13sp'
+                    color: [0.5, 0.5, 0.5, 1]
+                    size_hint_y: None
+                    height: dp(20)
+                    halign: 'left'
+                    text_size: self.size
+
+                SetupOptionCard:
+                    # Snížený pravý padding pro lepší zarovnání
+                    padding: [dp(15), 0, dp(25), 0]
+
+                    Label:
+                        text: root.ip_address
+                        color: {WHITE}
+                        halign: 'left'
+                        valign: 'middle'
+                        text_size: self.size
+                        font_size: '15sp'
+                    
+                    MDIconButton:
+                        icon: "share-variant"
+                        theme_text_color: "Custom"
+                        text_color: {WIN_GREEN}
+                        pos_hint: {{'center_y': .5}}
+                        size_hint: None, None
+                        size: dp(42), dp(42)
+                        on_release: root.share_ip()
+
             Widget:
 
             AnchorLayout:
@@ -239,16 +283,42 @@ class TournamentSetupScreen(MDScreen):
     rounds_count = NumericProperty(0)
     players_count = NumericProperty(0)
     playoff_enabled = BooleanProperty(False)
+    ip_address = StringProperty("Zjišťuji IP...")
 
     def __init__(self, **kwargs):
         Builder.load_string(KV_SETUP)
         super().__init__(**kwargs)
 
+    def get_local_ip(self):
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(("8.8.8.8", 80))
+            ip = s.getsockname()[0]
+            s.close()
+            return f"http://{ip}:8000"
+        except Exception:
+            return "http://127.0.0.1:8000"
+
+    def share_ip(self):
+        Clipboard.copy(self.ip_address)
+        toast(f"Adresa zkopírována: {self.ip_address}")
+
     def on_pre_enter(self):
-        from kivy.app import App
         app = App.get_running_app()
         self.players_count = len(app.selected_names)
         self.rounds_count = self.swiss_rounds_logic(self.players_count)
+        self.ip_address = self.get_local_ip()
+
+        # ODESLÁNÍ DAT NA SERVER PRO DIVÁKY
+        dnes = datetime.date.today().strftime("%d. %m. %Y")
+        if app.web_server:
+            app.web_server.update_data({
+                "title": "Příprava turnaje",
+                "date": dnes,
+                "players_count": self.players_count,
+                "rounds_count": self.rounds_count,
+                "phase": "lobby"
+            })
 
     def swiss_rounds_logic(self, n):
         if n <= 1: return 0

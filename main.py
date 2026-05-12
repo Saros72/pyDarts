@@ -1,5 +1,6 @@
 import random
 import time
+import threading # Přidáno pro běh serveru
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import ScreenManager, SlideTransition
 from kivy.core.window import Window
@@ -25,9 +26,12 @@ from playoff import PlayoffScreen
 from after_playoff_results import AfterPlayoffScreen
 from about_tournament import AboutScreen
 
+# --- NOVÝ IMPORT SERVERU ---
+from tournament_server import TournamentServer
+
 # Definice tvé primární barvy
-HEX_PRIMARY = "#1D378A"
 HEX_PRIMARY = "#3F51B5"
+#HEX_PRIMARY = "#157DDC"
 
 
 class TournamentApp(MDApp):
@@ -35,25 +39,36 @@ class TournamentApp(MDApp):
     selected_names = []
     app_manager = None
     
+    # --- PROMĚNNÁ PRO SERVER ---
+    web_server = None
+    
     playoff_enabled = BooleanProperty(False)
     last_back_tap = 0
     debug_logging = True  
     log_filename = "turnaj_log.txt"
 
     def build(self):
-        # 1. Globální přepsání barvy Indigo tvým vlastním HEX kódem
-        # Odstraníme '#' pro vnitřní slovník barev KivyMD
+        # 1. Globální přepsání barvy Indigo
         clean_hex = HEX_PRIMARY.lstrip('#')
         colors["Indigo"]["500"] = clean_hex
-        colors["Indigo"]["200"] = clean_hex  # Pro jistotu u některých Dark témat
-        colors["Indigo"]["700"] = clean_hex  # Pro tmavší varianty
+        colors["Indigo"]["200"] = clean_hex
+        colors["Indigo"]["700"] = clean_hex
 
         # 2. Nastavení barev pro systémovou lištu (Android)
         if platform == "android":
             set_bars_colors(get_color_from_hex(HEX_PRIMARY), get_color_from_hex(HEX_PRIMARY), "Dark")
             Window.softinput_mode = "resize"
 
-        # 3. Konfigurace tématu
+        # 3. --- START SERVERU ---
+        # Spouštíme hned při startu aplikace v samostatném vlákně
+        try:
+            self.web_server = TournamentServer(http_port=8000, ws_port=8765)
+            server_thread = threading.Thread(target=self.web_server.run, daemon=True)
+            server_thread.start()
+        except Exception as e:
+            print(f"Chyba při startu serveru: {e}")
+
+        # 4. Konfigurace tématu
         self.theme_cls.theme_style = "Dark"
         self.theme_cls.primary_palette = "Indigo"
         
@@ -80,6 +95,11 @@ class TournamentApp(MDApp):
         self.sm.add_widget(AfterPlayoffScreen(name='after_playoff_screen'))
         
         return self.sm
+
+    # Zajištění vypnutí serveru při zavření aplikace
+    def on_stop(self):
+        # Pokud bys chtěl server explicitně ukončit, ale daemon=True se o to postará
+        pass
 
     def on_key_down(self, window, key, *args):
         if key == 27:  # Klávesa ESC / Back
@@ -211,10 +231,7 @@ class TournamentApp(MDApp):
         
         pairings = self.app_manager.generate_pairings(round_num)
         
-        # Počítadlo pro pořadí zápasů
         match_count = 1
-        
-        # 1. Přidání běžných zápasů s číslováním
         for p1, p2 in pairings:
             card = PairCard(
                 player1=p1, 
@@ -224,7 +241,6 @@ class TournamentApp(MDApp):
             container.add_widget(card)
             match_count += 1
             
-        # 2. Přidání BYE (volný los) - ten nepotřebuje číslo zápasu
         for m in self.app_manager.matches:
             if m['round'] == round_num and m['p2'] is None:
                 card = PairCard(

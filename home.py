@@ -25,7 +25,7 @@ KV_HOME = f'''
             right_action_items: 
                 [
                 ["account-multiple", lambda x: app.on_players_click()], 
-                ["help-circle-outline", lambda x: app.go_to_about()]
+                ["information-outline", lambda x: app.go_to_about()]
                 ]
 
         # --- STŘEDOVÁ ČÁST S LOGEM ---
@@ -40,7 +40,7 @@ KV_HOME = f'''
 
             Label:
                 markup: True
-                text: "[i][color=#666666]py[/color][/i][b][color=#3F51B5]Darts[/color][/b]"
+                text: "[i][color=#666666]py[/color][/i][b][color=#157DDC]Darts[/color][/b]"
                 font_size: '42sp'
                 size_hint_y: None
                 height: dp(60)
@@ -104,7 +104,7 @@ KV_HOME = f'''
             Label:
                 text: "v0.1.0"
                 font_size: '14sp'
-                color: [0.3, 0.3, 0.3, 1]
+                color: [0.5, 0.5, 0.5, 1]
                 size_hint_y: None
                 height: self.texture_size[1]
                 halign: 'center'
@@ -113,7 +113,7 @@ KV_HOME = f'''
             Label:
                 text: "Powered by Sároš"
                 font_size: '14sp'
-                color: [0.3, 0.3, 0.3, 1]
+                color: [0.5, 0.5, 0.5, 1]
                 size_hint_y: None
                 height: self.texture_size[1]
                 halign: 'center'

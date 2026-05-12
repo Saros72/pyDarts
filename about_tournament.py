@@ -6,8 +6,12 @@ from kivy.metrics import dp
 # --- KONFIGURACE BAREV (stejné jako v Home) ---
 DARK_BG = [0.08, 0.08, 0.1, 1]
 CARD_BG = [0.15, 0.17, 0.25, 1]
+#CARD_BG = [0.12, 0.15, 0.20, 1]
 TEXT_GRAY = [0.7, 0.7, 0.7, 1]
 WHITE = [1, 1, 1, 1]
+WIN_GREEN = [0.0, 0.9, 0.4, 1]
+MATCH_BLUE = [0.08, 0.49, 0.86, 1]
+
 
 KV_ABOUT = f'''
 <InfoCard@BoxLayout>:
@@ -54,7 +58,8 @@ KV_ABOUT = f'''
                         text: "Švýcarský systém"
                         font_size: '22sp'
                         bold: True
-                        color: app.theme_cls.primary_color
+
+                        color: "#157DDC"
                         size_hint_y: None
                         height: self.texture_size[1]
                         halign: 'left'
@@ -75,7 +80,7 @@ KV_ABOUT = f'''
                         text: "Jak probíhá párování?"
                         font_size: '18sp'
                         bold: True
-                        color: app.theme_cls.primary_color
+                        color: "#157DDC"
                         size_hint_y: None
                         height: self.texture_size[1]
                         halign: 'left'
@@ -84,7 +89,7 @@ KV_ABOUT = f'''
                     Label:
                         text: "V prvním kole jsou hráči spárováni náhodně, nebo podle nasazení. Od druhého kola systém páruje hráče s podobným počtem bodů. Cílem je, aby proti sobě stáli výkonnostně vyrovnaní soupeři. Žádný hráč nehraje dvakrát se stejným hráčem."
                         font_size: '15sp'
-                        color: {TEXT_GRAY}
+                        color: {WHITE}
                         size_hint_y: None
                         height: self.texture_size[1]
                         halign: 'left'
@@ -96,7 +101,7 @@ KV_ABOUT = f'''
                         text: "Hlavní výhody"
                         font_size: '18sp'
                         bold: True
-                        color: app.theme_cls.primary_color
+                        color: "#157DDC"
                         size_hint_y: None
                         height: self.texture_size[1]
                         halign: 'left'
@@ -105,7 +110,7 @@ KV_ABOUT = f'''
                     Label:
                         text: "• Nikdo nevypadává po první prohře.\\n• Turnaj je spravedlivý i při velkém počtu hráčů.\\n• Systém se sám postará o to, aby si začátečníci zahráli se začátečníky a profíci s profíky."
                         font_size: '15sp'
-                        color: {TEXT_GRAY}
+                        color: {WHITE}
                         size_hint_y: None
                         height: self.texture_size[1]
                         halign: 'left'
@@ -117,7 +122,7 @@ KV_ABOUT = f'''
                         text: "Kritéria pořadí"
                         font_size: '18sp'
                         bold: True
-                        color: app.theme_cls.primary_color
+                        color: "#157DDC"
                         size_hint_y: None
                         height: self.texture_size[1]
                         halign: 'left'
@@ -132,7 +137,7 @@ KV_ABOUT = f'''
                             "4. [b]Sonneborn-Berger:[/b] Součet bodů soupeřů, které jste dokázali porazit.\\n" \
                             "5. [b]Vzájemný zápas:[/b] Pokud je vše výše uvedené shodné, rozhoduje výsledek přímého souboje."
                         font_size: '15sp'
-                        color: {TEXT_GRAY}
+                        color: {WHITE}
                         size_hint_y: None
                         height: self.texture_size[1]
                         halign: 'left'

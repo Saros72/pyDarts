@@ -138,7 +138,7 @@ KV_CONTENT = f'''
                                 color: {GREY}
                                 halign: 'center'
                             Label:
-                                text: "BH"
+                                text: "BHc1"
                                 font_size: '11sp'
                                 color: {GREY}
                                 halign: 'center'

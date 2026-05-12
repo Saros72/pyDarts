@@ -55,7 +55,7 @@ Builder.load_string(f"""
         Label:
             text: root.match_label
             font_size: '14sp'
-            color: app.theme_cls.primary_color
+            color: "#157DDC"
             bold: True
             halign: 'center'
             letter_spacing: 1.2
