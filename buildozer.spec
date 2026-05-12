@@ -13,7 +13,7 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,json,txt,pdf,ini
 
 # --- REQUIREMENTS ---
-requirements = python3,kivy,kivymd,pillow,pyjnius,fpdf2,https://github.com/fonttools/fonttools/archive/refs/heads/main.zip
+requirements = python3,kivy,kivymd,pillow,pyjnius,fpdf2,websockets,https://github.com/fonttools/fonttools/archive/refs/heads/main.zip
 
 # --- UI ---
 orientation = portrait
